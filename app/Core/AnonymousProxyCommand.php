@@ -18,7 +18,6 @@ abstract class AnonymousProxyCommand extends Command
     public function __construct(readonly private ProxyDefinition $proxyDefinition)
     {
         // Remove signature from argv
-        $this->argv = array_slice($_SERVER['argv'], 2);
         $this->signature = $this->proxyDefinition->signature;
         $this->description = $this->proxyDefinition->description;
         $this->setAliases($this->proxyDefinition->aliases);
@@ -34,6 +33,8 @@ abstract class AnonymousProxyCommand extends Command
 
     public function __invoke(): int
     {
+        $this->argv = array_slice($_SERVER['argv'], 2);
+
         $container = $this->resolveContainer();
         $user = $this->resolveUserFromContainer($container);
 

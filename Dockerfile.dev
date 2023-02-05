@@ -37,9 +37,6 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV COMPOSER_ALLOW_XDEBUG=0
 ENV COMPOSER_DISABLE_XDEBUG_WARN=1
 
-# Miscellany
-RUN setcap "cap_net_bind_service=+ep" /usr/local/bin/php
-RUN echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
 RUN chown -R www-data:www-data /app
 RUN chown -R www-data:www-data /tmp
 
