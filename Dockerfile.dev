@@ -1,0 +1,49 @@
+FROM php:8.2-cli-alpine
+
+LABEL maintainer="Adrien DELHOM <adrien.delhom@outlook.com>"
+
+WORKDIR /app
+
+ARG UID=1000
+
+ENV TZ=UTC
+
+# Default system packets
+RUN apk add --no-cache --update --repository http://nl.alpinelinux.org/alpine/edge/testing/ $PHPIZE_DEPS \
+    git \
+    libcap \
+    make \
+    curl \
+    zip \
+    unzip \
+    shadow \
+    docker-cli \
+    docker-cli-compose
+
+# Php extensions manager
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+RUN set -eux;
+RUN chmod +x /usr/local/bin/install-php-extensions
+
+# Install PHP extensions
+RUN install-php-extensions \
+    bcmath \
+    zip \
+    @composer
+
+# Composer configuration
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_ALLOW_XDEBUG=0
+ENV COMPOSER_DISABLE_XDEBUG_WARN=1
+
+# Miscellany
+RUN setcap "cap_net_bind_service=+ep" /usr/local/bin/php
+RUN echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
+RUN chown -R www-data:www-data /app
+RUN chown -R www-data:www-data /tmp
+
+# Shadow user host and user container
+RUN usermod -u $UID www-data
+
+ENTRYPOINT ["tail", "-f", "/dev/null"]

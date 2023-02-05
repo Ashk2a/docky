@@ -1,0 +1,9 @@
+/vendor
+/.idea
+/.vscode
+/.vagrant
+.phpunit.result.cache
+.env
+.docky.env
+proxy
+ray.php

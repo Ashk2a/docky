@@ -1,0 +1,24 @@
+{
+    "containers": {
+        "app": {
+            "user": "www-data"
+        }
+    },
+    "proxies": {
+        "composer": {
+            "command": "composer",
+            "aliases": ["c"],
+            "containers": ["app"]
+        },
+        "artisan": {
+            "command": "php artisan",
+            "aliases": ["a"],
+            "containers": ["app"]
+        },
+        "shell": {
+            "command": "sh",
+            "aliases": ["sh"],
+            "containers": ["app"]
+        }
+    }
+}

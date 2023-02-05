@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+    app:
+        container_name: ${COMPOSE_PROJECT_NAME}_${CONTAINER_APP_NAME}
+        security_opt:
+            - no-new-privileges:true
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+            args:
+                UID: ${HOST_UID}
+        volumes:
+            - ./:/app
+            - /etc/localtime:/etc/localtime:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+

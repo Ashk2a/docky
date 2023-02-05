@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+docker run \
+    --rm --interactive --tty \
+    --security-opt no-new-privileges \
+    --volume $PWD:/app \
+    docky
