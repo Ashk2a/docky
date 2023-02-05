@@ -10,11 +10,6 @@
             "aliases": ["c"],
             "containers": ["app"]
         },
-        "artisan": {
-            "command": "php artisan",
-            "aliases": ["a"],
-            "containers": ["app"]
-        },
         "shell": {
             "command": "sh",
             "aliases": ["sh"],
