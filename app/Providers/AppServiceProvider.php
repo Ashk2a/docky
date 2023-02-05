@@ -39,7 +39,6 @@ class AppServiceProvider extends ServiceProvider
         $containers = $this->extractContainersFromConfig($config);
         $commands = $this->buildAnonymousCommandsFromConfig($config);
 
-        // Load containers definitions
         Config::set('docky.containers', $containers);
 
         Artisan::starting(
@@ -77,7 +76,6 @@ class AppServiceProvider extends ServiceProvider
 
     private function buildAnonymousCommandsFromConfig(array $config): array
     {
-        // Load proxies commands
         $proxies = Arr::get($config, 'proxies', []);
         $commands = [];
 

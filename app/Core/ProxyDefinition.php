@@ -15,7 +15,7 @@ readonly class ProxyDefinition
     public function __construct(public string $signature, array $rawDefinition)
     {
         $this->command = $rawDefinition['command'];
-        $this->description = $rawDefinition['description'] ?? 'nothing';
+        $this->description = $rawDefinition['description'] ?? '';
         $this->aliases = $rawDefinition['aliases'] ?? [];
         $this->containers = $rawDefinition['containers'] ?? [];
     }
