@@ -30,7 +30,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 WORKDIR /docky
 COPY . /docky
-RUN composer install
+RUN composer install --ignore-platform-reqs --no-interaction --prefer-dist --no-scripts --no-dev --optimize-autoloader
 RUN chmod +x /docky/docky
 
 RUN chmod +x /docky/docker-entrypoint.sh
