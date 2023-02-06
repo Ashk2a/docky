@@ -1,8 +1,12 @@
 #!/bin/sh
 
+set -e
+
 # Inject config
 cp /app/docky.json /docky/docky.json
 cp /app/.docky.env /docky/.env
 
 # Run
-/usr/local/bin/php /docky/docky "$@"
+set -- /usr/local/bin/php /docky/docky "$@"
+
+exec "$@"
