@@ -35,6 +35,7 @@ RUN chmod +x /docky/docky
 
 RUN chmod +x /docky/docker-entrypoint.sh
 
-WORKDIR /app
+WORKDIR /var/app
+VOLUME /var/app
 
 ENTRYPOINT ["/docky/docker-entrypoint.sh"]

@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Core\AnonymousProxyCommand;
-use App\Core\ProxyDefinition;
+use App\Core\AnonymousCommand;
+use App\Core\AnonymousCommandDefinition;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
@@ -13,27 +13,7 @@ use RuntimeException;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        //
-    }
-
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
     public function register(): void
-    {
-        $this->registerDocky();
-    }
-
-    private function registerDocky(): void
     {
         $config = $this->loadDockyConfig();
         $containers = $this->extractContainersFromConfig($config);
@@ -41,11 +21,7 @@ class AppServiceProvider extends ServiceProvider
 
         Config::set('docky.containers', $containers);
 
-        Artisan::starting(
-            function (Artisan $artisan) use ($commands) {
-                $artisan->addCommands($commands);
-            }
-        );
+        Artisan::starting(static fn (Artisan $artisan) => $artisan->addCommands($commands));
     }
 
     private function loadDockyConfig(): array
@@ -76,12 +52,12 @@ class AppServiceProvider extends ServiceProvider
 
     private function buildAnonymousCommandsFromConfig(array $config): array
     {
-        $proxies = Arr::get($config, 'proxies', []);
+        $proxies = Arr::get($config, 'commands.customs', []);
         $commands = [];
 
         foreach ($proxies as $signature => $proxy) {
-            $definition = new ProxyDefinition($signature, $proxy);
-            $commands[] = new class($definition) extends AnonymousProxyCommand
+            $definition = new AnonymousCommandDefinition($signature, $proxy);
+            $commands[] = new class($definition) extends AnonymousCommand
             {
             };
         }

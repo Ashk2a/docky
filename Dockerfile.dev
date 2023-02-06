@@ -2,7 +2,7 @@ FROM php:8.2-cli-alpine
 
 LABEL maintainer="Adrien DELHOM <adrien.delhom@outlook.com>"
 
-WORKDIR /app
+WORKDIR /var/app
 
 ARG UID=1000
 
@@ -37,7 +37,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV COMPOSER_ALLOW_XDEBUG=0
 ENV COMPOSER_DISABLE_XDEBUG_WARN=1
 
-RUN chown -R www-data:www-data /app
+RUN chown -R www-data:www-data /var/app
 RUN chown -R www-data:www-data /tmp
 
 # Shadow user host and user container

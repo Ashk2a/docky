@@ -3,7 +3,7 @@
 docker run \
     --rm --interactive --tty \
     --security-opt no-new-privileges \
-    --volume $PWD:/app \
+    --volume $PWD:/var/app \
     --volume /etc/localtime:/etc/localtime:ro \
     --volume /var/run/docker.sock:/var/run/docker.sock:ro \
     docky "$@"

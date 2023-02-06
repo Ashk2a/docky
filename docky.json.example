@@ -4,16 +4,14 @@
             "user": "www-data"
         }
     },
-    "proxies": {
-        "composer": {
-            "command": "composer",
-            "aliases": ["c"],
-            "containers": ["app"]
-        },
-        "shell": {
-            "command": "sh",
-            "aliases": ["sh"],
-            "containers": ["app"]
+    "commands": {
+        "customs": {
+            "shell": {
+                "command": "sh",
+                "aliases": ["sh"],
+                "description": "Enter in a shell container",
+                "containers": ["app"]
+            }
         }
     }
 }

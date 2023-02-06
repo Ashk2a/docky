@@ -7,17 +7,17 @@ use LaravelZero\Framework\Commands\Command;
 use RuntimeException;
 use Symfony\Component\Process\Process;
 
-abstract class AnonymousProxyCommand extends Command
+abstract class AnonymousCommand extends Command
 {
     private const CONTAINER_OPTION = '--on=';
 
     private const ROOT_OPTION = '--root';
 
-    private array $argv = [];
+    private array $argv;
 
-    public function __construct(readonly private ProxyDefinition $proxyDefinition)
+    public function __construct(readonly private AnonymousCommandDefinition $proxyDefinition)
     {
-        // Remove signature from argv
+        $this->argv = array_slice($_SERVER['argv'], 2);
         $this->signature = $this->proxyDefinition->signature;
         $this->description = $this->proxyDefinition->description;
         $this->setAliases($this->proxyDefinition->aliases);
@@ -25,7 +25,7 @@ abstract class AnonymousProxyCommand extends Command
         parent::__construct();
     }
 
-    public function configure()
+    public function configure(): void
     {
         // We don't use the symfony Input so ignore his validation.
         $this->ignoreValidationErrors();
@@ -33,18 +33,11 @@ abstract class AnonymousProxyCommand extends Command
 
     public function __invoke(): int
     {
-        $this->argv = array_slice($_SERVER['argv'], 2);
-
-        $container = $this->resolveContainer();
-        $user = $this->resolveUserFromContainer($container);
-
         $process = Process::fromShellCommandline(
-            $this->buildProxyCommand(
-                $container,
-                $user
-            )
+            $this->buildProxyCommand()
         );
 
+        $process->setTimeout(3600);
         $process->setTty(true);
         $process->run();
 
@@ -53,21 +46,38 @@ abstract class AnonymousProxyCommand extends Command
         return self::SUCCESS;
     }
 
+    private function buildProxyCommand(): string
+    {
+        if (empty($this->proxyDefinition->containers)) {
+            return trim($this->proxyDefinition->command.' '.implode(' ', $this->argv));
+        }
+
+        $container = $this->resolveContainer();
+        $user = $this->resolveUserFromContainer($container);
+
+        return sprintf(
+            'docker compose exec -u %s "%s" %s',
+            $user,
+            $container,
+            trim($this->proxyDefinition->command.' '.implode(' ', $this->argv))
+        );
+    }
+
     private function resolveContainer(): string
     {
         $allowedContainer = $this->proxyDefinition->containers;
         $availableContainers = array_keys(Config::get('docky.containers'));
 
-        foreach ($this->argv as $k => $arg) {
+        foreach (array_reverse($this->argv) as $k => $arg) {
             $arg = str($arg);
 
             if (! $arg->startsWith(self::CONTAINER_OPTION)) {
                 continue;
             }
 
-            $container = $arg->after(self::CONTAINER_OPTION);
+            $container = $arg->after(self::CONTAINER_OPTION)->value();
 
-            if (! in_array($container, $availableContainers)) {
+            if (! in_array($container, $availableContainers, true)) {
                 throw new RuntimeException('No container named "'.$container.'" has been found.');
             }
 
@@ -76,31 +86,19 @@ abstract class AnonymousProxyCommand extends Command
             return $container;
         }
 
-        return empty($allowedContainer)
-            ? $availableContainers[0]
-            : $allowedContainer[0];
+        return $allowedContainer[0];
     }
 
     private function resolveUserFromContainer(string $container): string
     {
         $defaultUser = Config::get('docky.containers.'.$container.'.user', 'root');
 
-        if (in_array(self::ROOT_OPTION, $_SERVER['argv'])) {
-            unset($this->argv[array_search(self::ROOT_OPTION, $this->argv)]);
+        if (in_array(self::ROOT_OPTION, $_SERVER['argv'], true)) {
+            unset($this->argv[array_search(self::ROOT_OPTION, $this->argv, true)]);
 
             return 'root';
         }
 
         return $defaultUser;
-    }
-
-    private function buildProxyCommand(string $container, string $user): string
-    {
-        return sprintf(
-            'docker compose exec -u %s "%s" %s',
-            $user,
-            $container,
-            trim($this->proxyDefinition->command.' '.implode(' ', $this->argv))
-        );
     }
 }

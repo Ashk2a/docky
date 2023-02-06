@@ -11,7 +11,7 @@ services:
             args:
                 UID: ${HOST_UID}
         volumes:
-            - ./:/app
-            - /etc/localtime:/etc/localtime:ro
-            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./:/var/app
+            - /etc/localtime:/etc/localtime
+            - /var/run/docker.sock:/var/run/docker.sock
 
