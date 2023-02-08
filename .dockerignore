@@ -1,0 +1,10 @@
+vendor
+Dockerfile
+Dockerfile.dev
+docker-compose.yaml
+*.example
+ray.php
+.editorconfig
+.git*
+proxy
+.env*
